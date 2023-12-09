@@ -2,7 +2,6 @@
 #define _TICTACTOE_GAME_
 
 #include <exception>
-#include <vector>
 #include <utility>
 
 #include "TicTacToeBoard.h"
@@ -19,6 +18,8 @@ public:
 
 		TicTacToeBoard board;
 
+		uint32_t       turn; 
+
 		typedef enum _GameState {
 			ST_X_TURN,
 			ST_O_TURN,
@@ -27,23 +28,24 @@ public:
 
 		GameState currentState; 		
 		
-		void advanceGameState(int i, int j);
-		bool checkForThreeInARow(int i, int j);
-		bool checkRow(int row);
-		bool checkColumn(int col);
-		bool checkDiagnals(int i, int j);
+		void advanceGameState(int row, int col);
+		void advanceToNextTurn();
+		bool intersectsWinningMarkerSet(int row, int col);
+		bool intersectsWinningRow(int row);
+		bool intersectsWinningColumn(int col);
+		bool intersectsWinningDiagonal(int row, int col);
 		bool checkForCatsGame();
-		bool isSquareEmpty(int i, int j);
-		bool allEqual(std::vector<Square> v);
+		bool isSquareEmpty(int row, int col);
+		bool allEqual(MarkerSet & m);
 		void setWinner();
 		Winner winner;
 	public:
 
 		TicTacToeGame(); 
 		bool isGameOver();
-		Square getCurrentMarker();
+		Marker getCurrentMarker();
 		Winner getWinner();
-		void TakeTurn(int i, int j);
+		void TakeTurn(int row, int col);
 				
 };
 

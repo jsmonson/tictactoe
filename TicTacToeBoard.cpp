@@ -2,41 +2,41 @@
 
 TicTacToeBoard::TicTacToeBoard()
 {
-	for (int i = 0; i < 3; i++) {
-		for (int j = 0; j < 3; j++) {
-			squares[i][j] = Square::EMPTY;
+	for (int i = 0; i < MAX_SQUARE_DIM; i++) {
+		for (int j = 0; j < MAX_SQUARE_DIM; j++) {
+			board[i][j] = Marker::NONE;
 		}
 	}
 }
 
-std::vector<Square> TicTacToeBoard::getRow(int i)
+MarkerSet TicTacToeBoard::getRow(int rowindex)
 {
-	return {squares[i][0],  squares[i][1],  squares[i][2]};
+	return {board[rowindex][0],  board[rowindex][1],  board[rowindex][2]};
 }
 
-std::vector<Square> TicTacToeBoard::getColumn(int j)
+MarkerSet TicTacToeBoard::getColumn(int colindex)
 {
-	return {squares[0][j],  squares[1][j],  squares[2][j]};
+	return {board[0][colindex],  board[1][colindex],  board[2][colindex]};
 }
 
-std::vector<Square> TicTacToeBoard::getLeadingDiagnal()
+MarkerSet TicTacToeBoard::getLeadingDiagnal()
 {
-	return {squares[0][0],  squares[1][1],  squares[2][2]};
+	return {board[0][0],  board[1][1],  board[2][2]};
 }
 
-std::vector<Square> TicTacToeBoard::getCounterDiagnal()
+MarkerSet TicTacToeBoard::getCounterDiagnal()
 {
-	return {squares[2][0], squares[1][1], squares[0][2]};
+	return {board[2][0], board[1][1], board[0][2]};
 }
 
-bool TicTacToeBoard::isLeadingDiagnal(int i, int j)
+bool TicTacToeBoard::isLeadingDiagnal(int row, int col)
 {
-	return (i == j);
+	return (row == col);
 }
 
-bool TicTacToeBoard::isCounterDiagnal(int i, int j)
+bool TicTacToeBoard::isCounterDiagnal(int row, int col)
 {
-	return ((i + j) == 2);
+	return ((row + col) == 2);
 }
 
 bool TicTacToeBoard::indexOutOfRange(int n)
@@ -44,32 +44,27 @@ bool TicTacToeBoard::indexOutOfRange(int n)
 	return (n < 0) || (n >= MAX_SQUARE_DIM);
 }
 
-bool TicTacToeBoard::isValidMarkerPlacement(int i, int j)
+bool TicTacToeBoard::isValidMarkerPlacement(int row, int col)
 {
-	return !indexOutOfRange(i) && !indexOutOfRange(j) && !isOccupied(i, j);
+	return !indexOutOfRange(row) && !indexOutOfRange(col) && !isMarked(row, col);
 }
 
-bool  TicTacToeBoard::isOccupied(int i, int j)
+bool  TicTacToeBoard::isMarked(int row, int col)
 {
-	return squares[i][j] != Square::EMPTY;
+	return board[row][col] != Marker::NONE;
 }
 
-Square TicTacToeBoard::getSquare(int i, int j)
+Marker TicTacToeBoard::getMarker(int row, int col)
 {
-	return squares[i][j];
+	return board[row][col];
 }
 
-Square TicTacToeBoard::getSquare(std::pair<int, int> p)
+void TicTacToeBoard::placeMarker(Marker s, int row, int col)
 {
-	return getSquare(p.first, p.second);
-}
-
-void TicTacToeBoard::placeMarker(Square s, int i, int j)
-{
-	if (!isValidMarkerPlacement(i, j))
+	if (!isValidMarkerPlacement(row, col))
 	{
 		throw InvalidMarkerPlacementException();
 	}
 
-	squares[i][j] = s;
+	board[row][col] = s;
 }

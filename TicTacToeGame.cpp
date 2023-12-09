@@ -1,22 +1,29 @@
 #include "TicTacToeGame.h"
 #include <iostream>
 
-TicTacToeGame::TicTacToeGame() {
-
-	winner = CAT;
+TicTacToeGame::TicTacToeGame()
+{
+	winner = CAT; 
 	currentState = ST_X_TURN;
-	 
+	turn = 0; 
 }
 
-void TicTacToeGame::TakeTurn(int i, int j)
+void TicTacToeGame::advanceToNextTurn()
 {
-	board.placeMarker(getCurrentMarker(), i, j);
-	advanceGameState(i, j);
+	turn++;
 }
 
-void TicTacToeGame::advanceGameState(int i, int j)
+
+void TicTacToeGame::TakeTurn(int row, int col)
 {
-	if (checkForThreeInARow(i, j))
+	board.placeMarker(getCurrentMarker(), row, col);
+	advanceGameState(row, col);
+	advanceToNextTurn();
+}
+
+void TicTacToeGame::advanceGameState(int row, int col)
+{
+	if (intersectsWinningMarkerSet(row, col))
 	{
 		setWinner();
 		currentState = GameState::ST_GAME_OVER;
@@ -40,31 +47,21 @@ void TicTacToeGame::advanceGameState(int i, int j)
 }
 
 
-Square TicTacToeGame::getCurrentMarker() {
+Marker TicTacToeGame::getCurrentMarker() {
 	if(currentState == ST_X_TURN)
 	{ 
-		return Square::X;
+		return Marker::X;
 	}
 	else 
 	{
-		return Square::O;
+		return Marker::O;
 	}
 	
 }
 
 bool TicTacToeGame::checkForCatsGame()
 {
-	for (int i = 0; i < MAX_SQUARE_DIM; i++)
-	{
-		for (int j = 0; j < MAX_SQUARE_DIM; j++)
-		{
-			if (!board.isOccupied(i,j))
-			{
-				return false; 
-			}
-		}
-	}
-	return true;
+	return (winner == CAT && turn == 8);
 }
 
 bool TicTacToeGame::isGameOver()
@@ -81,10 +78,10 @@ TicTacToeGame::Winner TicTacToeGame::getWinner()
 	return winner;
 }
 
-bool TicTacToeGame::checkForThreeInARow(int i, int j)
+bool TicTacToeGame::intersectsWinningMarkerSet(int row, int col)
 {
 	
-	if (checkRow(i) || checkColumn(j) || checkDiagnals(i, j)) 
+	if (intersectsWinningRow(row) || intersectsWinningColumn(col) || intersectsWinningDiagonal(row, col)) 
 	{
 		return true;
 	}
@@ -94,7 +91,7 @@ bool TicTacToeGame::checkForThreeInARow(int i, int j)
 
 
 
-bool TicTacToeGame::checkRow(int row)
+bool TicTacToeGame::intersectsWinningRow(int row)
 {
 	if (allEqual(board.getRow(row)))
 	{
@@ -103,7 +100,7 @@ bool TicTacToeGame::checkRow(int row)
 	return false;
 }
 
-bool TicTacToeGame::checkColumn(int col)
+bool TicTacToeGame::intersectsWinningColumn(int col)
 {
 	if (allEqual(board.getColumn(col)))
 	{
@@ -112,27 +109,19 @@ bool TicTacToeGame::checkColumn(int col)
 	return false;
 }
 
-bool TicTacToeGame::checkDiagnals(int i, int j)
+bool TicTacToeGame::intersectsWinningDiagonal(int row, int col)
 {
-	if ((board.isLeadingDiagnal(i, j) && allEqual(board.getLeadingDiagnal())) ||
-		(board.isCounterDiagnal(i, j) && allEqual(board.getCounterDiagnal())))
+	if ((board.isLeadingDiagnal(row, col) && allEqual(board.getLeadingDiagnal())) ||
+		(board.isCounterDiagnal(row, col) && allEqual(board.getCounterDiagnal())))
 	{
 		return true;
 	}
 	return false;
 }
 
-bool TicTacToeGame::allEqual(std::vector<Square> v)
+bool TicTacToeGame::allEqual(MarkerSet& markers)
 {
-	for (int i = 1; i < v.size(); i++)
-	{
-		if (v[i] != v[i - 1])
-		{
-			return false;
-		}
-	}
-	
-	return true;
+	return (markers.m[0] == markers.m[1]  && markers.m[1] == markers.m[2]);
 }
 
 void TicTacToeGame::setWinner()
